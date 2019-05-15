@@ -10,7 +10,7 @@ public class TempMgr : MonoBehaviour
 	public GameObject[] Cylinder;
 
     public float Speed;
-    public float thrust;
+    public bool isflag = false;
 
     void Start()
     {
@@ -37,23 +37,32 @@ public class TempMgr : MonoBehaviour
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
 
-        h *= Speed * Time.smoothDeltaTime;
-        v *= Speed * Time.smoothDeltaTime;
+        h = h * Speed * Time.smoothDeltaTime;
+        v = v * Speed * Time.smoothDeltaTime;
 
-        _gameObject.transform.Translate(Vector3.right * h);
-        _gameObject.transform.Translate(Vector3.forward * v);
+        _gameObject.transform.Translate(Vector3.right * h, Space.World);
+        _gameObject.transform.Translate(Vector3.up * v, Space.World);
 
         if (Input.GetKey(KeyCode.Space))
         {
-            //_gameObject.transform.Translate(Vector3.up * Time.smoothDeltaTime);
-            _gameObject.GetComponent<Rigidbody>().AddForce(0,0,thrust,ForceMode.Force);
+            isflag = true;
         }
-        if (Input.GetKey(KeyCode.Backspace)) _gameObject.transform.position = new Vector3(0,0,-3);
-    }
+        if (isflag)
+        {
+            _gameObject.GetComponent<Rigidbody>().AddForce(Vector3.forward * 150);
 
+        }
+        if (Input.GetKey(KeyCode.Backspace))
+        {
+            isflag = false;
+            _gameObject.transform.position = new Vector3(0, 0, -3);
+            _gameObject.transform.rotation = Quaternion.Euler(90, 0, 0);
+            _gameObject.GetComponent<Rigidbody>().Sleep();
+        }
+    }
     private void Update()
     {
-        moveCylinder(Cylinder[0]);
-        
+        moveCylinder(Cylinder[0]);        
     }
 }
+
