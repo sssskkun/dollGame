@@ -8,21 +8,25 @@ public class PowerBar : MonoBehaviour
     public GameObject HitBar;
     public GameObject HitArea;
     // Start is called before the first frame update
+    float randArea = 0f;
     void Start()
     {
         randPos(HitArea);
     }
     void randPos(GameObject _gameObject)
     {
-        _gameObject.GetComponent<RectTransform>().localPosition = new Vector3(Random.value * 50,0,0);
+        randArea = Random.value * 140;
+        _gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(randArea,0);
     }
     // Update is called once per frame
     int i = 0;
-    float move = 0;
+    float move = 0f;
     bool moveBack = false;
+    bool moveStop = false;
     void moveBar(GameObject _gameObject)
     {
         move = i * moveSpeed / 1000;
+        
         if(move > 1)
         {
             moveBack = true;
@@ -31,9 +35,10 @@ public class PowerBar : MonoBehaviour
         {
             moveBack = false;
         }
-
-        _gameObject.GetComponent<RectTransform>().anchorMin = new Vector3(move, 0, 0);
-        _gameObject.GetComponent<RectTransform>().anchorMax = new Vector3(move, 0, 0);
+        if (moveStop == false)
+        {
+            _gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(move*140, 0);            
+        }
 
         if (moveBack == true)
         {
@@ -43,11 +48,26 @@ public class PowerBar : MonoBehaviour
         {
             i++;
         }
-    }
-    void barchk()
-    {
 
-    }
+        if (Input.GetKey(KeyCode.K))
+        {
+            moveStop = true;
+
+            if (move * 140 > (randArea - 5f) && move * 140 < (randArea + 5f))
+            {
+                Debug.Log("YESSSSSSSSSSSSSSSSSSSSSSSSSSS");
+            }
+            else
+                Debug.Log("NNNNNNOOOOOOOOOOOOOOOOOOOOOOO");
+        }
+        if (Input.GetKey(KeyCode.L))
+        {
+            moveStop = false;
+            move = 0.0f;
+            i = 0;
+        }
+    }   
+    
     
     void Update()
     {

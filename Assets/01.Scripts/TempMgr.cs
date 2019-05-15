@@ -14,7 +14,7 @@ public class TempMgr : MonoBehaviour
 
     void Start()
     {
-		Cylinder[0].transform.position = new Vector3(0,0,-3);
+		Cylinder[0].transform.position = new Vector3(0,0,-5);
         
 		for(int i = 0; i < Cube.Length; ++i)
 		{
@@ -49,7 +49,7 @@ public class TempMgr : MonoBehaviour
         }
         if (isflag)
         {
-            _gameObject.GetComponent<Rigidbody>().AddForce(Vector3.forward * 150);
+            _gameObject.GetComponent<Rigidbody>().AddForce(Vector3.forward * 300);
 
         }
         if (Input.GetKey(KeyCode.Backspace))

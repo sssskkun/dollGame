@@ -12,6 +12,8 @@ public class onCollisionEnter : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        collision.gameObject.GetComponent<Transform>().position = new Vector3();
+        //collision.gameObject.GetComponent<Transform>().position = new Vector3();
+        Debug.Log(collision.gameObject.GetComponent<Transform>().position);
+        Debug.Log(collision.gameObject.name);
     }
 }
