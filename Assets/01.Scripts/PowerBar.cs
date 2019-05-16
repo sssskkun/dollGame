@@ -71,8 +71,8 @@ public class PowerBar : MonoBehaviour
             }
             GameObject.Find("PowerCam").GetComponent<Camera>().enabled = false;
             GameObject.Find("GameCam").GetComponent<Camera>().enabled = true;
-            _tempMgr.triggerBar = true;
-            move = 0.0f;
+			_tempMgr.OntriggerBarStart();
+			move = 0.0f;
         }
 
         if (moveStop == false)
