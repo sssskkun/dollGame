@@ -15,5 +15,8 @@ public class onCollisionEnter : MonoBehaviour
         //collision.gameObject.GetComponent<Transform>().position = new Vector3();
         Debug.Log(collision.gameObject.GetComponent<Transform>().position);
         Debug.Log(collision.gameObject.name);
+        GameObject.Find("Cylinder").GetComponent<Rigidbody>().Sleep();
+        GameObject.Find("TempMgr").GetComponent<TempMgr>().pushBar = true;
+        GameObject.Find("TempMgr").GetComponent<TempMgr>().triggerBar = false;
     }
 }

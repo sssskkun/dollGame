@@ -8,13 +8,17 @@ public class TempMgr : MonoBehaviour
 	public GameObject[] floor;
 	public GameObject[] Cube;
 	public GameObject[] Cylinder;
+    public float pushPower = 100f;
 
     public float Speed;
-    public bool isflag = false;
+    public bool triggerBar = false;
+    public int moveTime;
+    public bool pushBar = false;
 
     void Start()
     {
-		Cylinder[0].transform.position = new Vector3(0,0,-5);
+        GameObject.Find("PowerCam").GetComponent<Camera>().enabled = false;
+        Cylinder[0].transform.position = new Vector3(0,0,-5);
         
 		for(int i = 0; i < Cube.Length; ++i)
 		{
@@ -32,8 +36,11 @@ public class TempMgr : MonoBehaviour
 		_gameObject.transform.position = new Vector3(1, _gameObject.transform.position.y, _gameObject.transform.position.z);
 	}
 
+    int i = 0;
+    int swit = 1;
     void moveCylinder(GameObject _gameObject)
     {
+        
         float h = Input.GetAxis("Horizontal");
         float v = Input.GetAxis("Vertical");
 
@@ -44,17 +51,37 @@ public class TempMgr : MonoBehaviour
         _gameObject.transform.Translate(Vector3.up * v, Space.World);
 
         if (Input.GetKey(KeyCode.Space))
-        {
-            isflag = true;
+        {            
+            GameObject.Find("GameCam").GetComponent<Camera>().enabled = false;
+            GameObject.Find("PowerCam").GetComponent<Camera>().enabled = true;
+            GameObject.Find("Sliding Area").GetComponent<PowerBar>().moveStop = false;
         }
-        if (isflag)
+        if (triggerBar)
+        {            
+            _gameObject.transform.position = new Vector3(_gameObject.transform.position.x, _gameObject.transform.position.y, _gameObject.transform.position.z + Time.deltaTime);
+        }
+        if(pushBar)
         {
-            _gameObject.GetComponent<Rigidbody>().AddForce(Vector3.forward * 300);
-
+            if(_gameObject.transform.position.z > -0.5)
+            {
+                swit = -1;
+                
+            }
+            _gameObject.transform.position = new Vector3(_gameObject.transform.position.x, _gameObject.transform.position.y, _gameObject.transform.position.z + Time.smoothDeltaTime * swit);
+            if (_gameObject.transform.position.z < -3)
+            {
+                _gameObject.GetComponent<Rigidbody>().Sleep();
+                pushBar = false;
+                i = 0;
+                swit = 1;
+            }
+            i++;
+            
+            
         }
         if (Input.GetKey(KeyCode.Backspace))
         {
-            isflag = false;
+            triggerBar = false;
             _gameObject.transform.position = new Vector3(0, 0, -3);
             _gameObject.transform.rotation = Quaternion.Euler(90, 0, 0);
             _gameObject.GetComponent<Rigidbody>().Sleep();
