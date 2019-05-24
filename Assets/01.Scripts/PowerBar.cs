@@ -56,8 +56,8 @@ public class PowerBar : MonoBehaviour
         }
 
         if (Input.GetKey(KeyCode.K))
-        {            
-            moveStop = true;
+        {
+            moveStopOn();
             i = 0;
             if (move * 140 > (randArea - 5f) && move * 140 < (randArea + 5f))
             {
@@ -71,8 +71,8 @@ public class PowerBar : MonoBehaviour
             }
             GameObject.Find("PowerCam").GetComponent<Camera>().enabled = false;
             GameObject.Find("GameCam").GetComponent<Camera>().enabled = true;
-			_tempMgr.OntriggerBarStart();
-			move = 0.0f;
+            _tempMgr.triggerBar = true;
+            move = 0.0f;
         }
 
         if (moveStop == false)
@@ -84,5 +84,10 @@ public class PowerBar : MonoBehaviour
     void Update()
     {
         moveBar(HitBar);        
+    }
+
+    public void moveStopOn()
+    {
+        moveStop = true;
     }
 }

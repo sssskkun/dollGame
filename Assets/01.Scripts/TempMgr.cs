@@ -7,126 +7,142 @@ public class TempMgr : MonoBehaviour
 
 	public GameObject[] floor;
 	public GameObject[] Cube;
-	public GameObject[] Cylinder;
-    public float pushPower = 100f;
+	public GameObject Cylinder;
+    public float pushPower = 10f;
 
     public float Speed;
     public bool triggerBar = false;
-    public int moveTime;
     public bool pushBar = false;
+    public float directY = 0.11f;
+    public float directX = 0.14f;
+    bool keyFlag = true;
+    float moveTime = 0f;
 
-	public float forceValue;
-	float time = 0.0f;
-
-
-	void Start()
+    enum pushBarStatus
     {
-        GameObject.Find("PowerCam").GetComponent<Camera>().enabled = false;
-        Cylinder[0].transform.position = new Vector3(0,0,-5);
-        
-		for(int i = 0; i < Cube.Length; ++i)
-		{
+        ready,
+        push,
+        pull,
+        stop,
+        init
+    }
+    pushBarStatus barStatus;
 
-			if(0 == i%2 )
-			{
-				asd(Cube[i]);
-			}
-		}
+    void Start()
+    {
+        if (GameObject.Find("PowerCam").GetComponent<Camera>().enabled == true)
+        {
+            GameObject.Find("PowerCam").GetComponent<Camera>().enabled = false;
+        }
+        Cylinder.transform.position = new Vector3(0,0,-5);
+        barStatus = pushBarStatus.ready;
 
-	}
+    }
 
 	void asd(GameObject _gameObject)
 	{
 		_gameObject.transform.position = new Vector3(1, _gameObject.transform.position.y, _gameObject.transform.position.z);
 	}
 
-    int i = 0;
-    int swit = 1;
-
     void moveCylinder(GameObject _gameObject)
     {
-        
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
+        // 키 입력 받아서 제어하는 방법
+        //float h = Input.GetAxis("Horizontal");
+        //float v = Input.GetAxis("Vertical");
 
-        h = h * Speed * Time.smoothDeltaTime;
-        v = v * Speed * Time.smoothDeltaTime;
+        //h = h * Speed * Time.smoothDeltaTime;
+        //v = v * Speed * Time.smoothDeltaTime;
 
-        _gameObject.transform.Translate(Vector3.right * h, Space.World);
-        _gameObject.transform.Translate(Vector3.up * v, Space.World);
+        //_gameObject.transform.Translate(Vector3.right * h, Space.World);
+        //_gameObject.transform.Translate(Vector3.up * v, Space.World);
 
 
+        switch (barStatus)
+        {
+            case pushBarStatus.ready:
+                if (_gameObject.transform.position.x > 7.5 || _gameObject.transform.position.x < -7.1)
+                {
+                    directX = -directX;
+                }
+                if (_gameObject.transform.position.y > 7 || _gameObject.transform.position.y < -1.5)
+                {
+                    directY = -directY;
+                }
+                if (pushBar)
+                {
+                    _gameObject.transform.Translate(Vector3.up * directY, Space.World);
+                    moveTime += Time.deltaTime;
+                    if(moveTime > 0.2)
+                    {
+                        keyFlag = true;
+                    }
+                }
+                else
+                {
+                    _gameObject.transform.Translate(Vector3.right * directX, Space.World);
+                }
 
-		if (Input.GetKey(KeyCode.Space))
-        {            
-            GameObject.Find("GameCam").GetComponent<Camera>().enabled = false;
-            GameObject.Find("PowerCam").GetComponent<Camera>().enabled = true;
-            GameObject.Find("Sliding Area").GetComponent<PowerBar>().moveStop = false;
+                break;
+            case pushBarStatus.push:
+                //_gameObject.GetComponent<Rigidbody>().AddForce(Vector3.forward * pushPower);
+                _gameObject.GetComponent<Rigidbody>().velocity = Vector3.forward * 10;
+                moveTime += Time.deltaTime;
+                if (Time.deltaTime > 1)
+                {
+                    barStatus = pushBarStatus.pull;
+                    moveTime = 0;
+                }
+                break;
+            case pushBarStatus.pull:
+                moveTime += Time.deltaTime;
+                _gameObject.GetComponent<Rigidbody>().AddForce(Vector3.back * pushPower);
+                if(Time.deltaTime > 1)
+                {
+                    barStatus = pushBarStatus.stop;
+                    moveTime = 0;
+                }
+                break;
+            case pushBarStatus.stop:
+                _gameObject.GetComponent<Rigidbody>().Sleep();
+                pushBar = false;
+                keyFlag = true;
+                break;
+            case pushBarStatus.init:
+                _gameObject.transform.position = new Vector3(0, 0, -5);
+                pushBar = false;
+                keyFlag = true;
+                break;
         }
 
-        if (triggerBar)
+        if (Input.GetKey(KeyCode.Space) && keyFlag)
         {
-			_gameObject.transform.position = new Vector3(_gameObject.transform.position.x, _gameObject.transform.position.y, _gameObject.transform.position.z + Time.deltaTime);
-
-		}
-
-        if(pushBar)
-        {
-			time += Time.deltaTime;
-
-			if(time < 1.0f)
-			{
-				_gameObject.GetComponent<Rigidbody>().AddForce(Vector3.forward * forceValue, ForceMode.Force);
-			}
-			else if(time >1.0f)
-			{
-				triggerBar = false;
-				_gameObject.GetComponent<Rigidbody>().Sleep();
-				_gameObject.transform.position = new Vector3(0, 0, -3);
-
-			}
-
-
-
-
-			//if(_gameObject.transform.position.z > -0.5)
-			//{
-			//    swit = -1;
-
-			//}
-			//_gameObject.transform.position = new Vector3(_gameObject.transform.position.x, _gameObject.transform.position.y, _gameObject.transform.position.z + Time.smoothDeltaTime * swit);
-			//if (_gameObject.transform.position.z < -3)
-			//{
-			//    _gameObject.GetComponent<Rigidbody>().Sleep();
-			//    pushBar = false;
-			//    i = 0;
-			//    swit = 1;
-			//}
-			//i++;
-
-
-		}
-		if (Input.GetKey(KeyCode.Backspace))
-        {
-            triggerBar = false;
-            _gameObject.transform.position = new Vector3(0, 0, -3);
-            _gameObject.transform.rotation = Quaternion.Euler(90, 0, 0);
-            _gameObject.GetComponent<Rigidbody>().Sleep();
-
-			time = 0.0f;
-
-		}
+            moveTime = 0;
+            switch (barStatus)
+            {
+                case pushBarStatus.init:
+                    barStatus = pushBarStatus.ready;
+                    break;
+                case pushBarStatus.stop:
+                    barStatus = pushBarStatus.init;
+                    break;                
+                case pushBarStatus.ready:
+                    if (pushBar)
+                    {
+                        barStatus = pushBarStatus.push;
+                    }
+                    pushBarOn();
+                    break;
+            }
+            keyFlag = false;
+        }
     }
-
-
-	public void OntriggerBarStart()
-	{
-		triggerBar = true;
-	}
-
     private void Update()
     {
-		moveCylinder(Cylinder[0]);
+        moveCylinder(Cylinder);        
+    }
+    public void pushBarOn()
+    {
+        pushBar = true;
     }
 }
 
